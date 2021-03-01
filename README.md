@@ -1,4 +1,5 @@
-# template-cs213
-CS213 template for all projects.
+# cs213-chess
+CLI Chess made in Java.
 
-This is a Gradle project with `java`, `application`, and `openjfx`
+## Running program
+`./gradlew run`
