@@ -1,5 +1,7 @@
 package edu.rutgers.chess;
 
+import edu.rutgers.chess.ChessHandler;
+
 /**
  * Main runner class
  * 
@@ -7,12 +9,9 @@ package edu.rutgers.chess;
  * @author Jared Tulayan
  */
 public class Chess {
-    public String getGreeting() {
-        return "Hello World!";
-    }
-
     public static void main(String[] args) {
-        System.out.println(new Chess().getGreeting());
-        System.out.println("Hello Again World!");
+        ChessHandler game = new ChessHandler();
+
+        System.out.println(game.toString());
     }
 }
