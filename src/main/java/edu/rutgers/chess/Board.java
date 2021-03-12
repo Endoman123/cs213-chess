@@ -7,7 +7,7 @@ package edu.rutgers.chess;
  * @author Oscar Bartolo
  * @author Jared Tulayan
  */
-public class ChessHandler {
+public class Board {
     /**
      * The actual board, represented as chars.
      */
@@ -42,9 +42,9 @@ public class ChessHandler {
     private byte castles;
 
     /**
-     * Constructs a new {@link ChessHandler} using a standard starting board.
+     * Constructs a new {@link Board} using a standard starting board.
      */
-    public ChessHandler() {
+    public Board() {
        this(new char[][] {
            {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
            {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
@@ -58,13 +58,13 @@ public class ChessHandler {
     }
 
     /**
-     * Constructs a new {@link ChessHandler} given the starting state.
+     * Constructs a new {@link Board} given the starting state.
      * 
      * @param state the starting board state of the pieces, 
      *              must be an 8x8 char array using only {@code B, b, K, k, N, n, P, p, Q, q, R, r},
      *              or space to represent tiles not taken up by a piece.
      */
-    public ChessHandler(char[][] state) {
+    public Board(char[][] state) {
         // Verify board
         if (state.length != 8)
             throw new IllegalArgumentException("Invalid board! Ranks != 8");
