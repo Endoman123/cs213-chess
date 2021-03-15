@@ -160,11 +160,11 @@ public class Board {
      */
     public char getPiece(int f, int r) {
         if (f < 1 || f > 8)
-            throw new IllegalArgumentException(String.format("File is out of range! f = %i", f));
+            throw new IllegalArgumentException(String.format("File is out of range! f = %d", f));
         if (r < 1 || r > 8)
-            throw new IllegalArgumentException(String.format("Rank is out of range! r = %i", r));
+            throw new IllegalArgumentException(String.format("Rank is out of range! r = %d", r));
 
-        return BOARD[f - 1][r - 1];
+        return BOARD[r - 1][f - 1];
     }
 
     /**
