@@ -1,5 +1,7 @@
 package edu.rutgers.chess;
 
+import edu.rutgers.chess.util.AlgebraicNotation;
+
 /**
  * This class handles the backend of the chess game.
  * Inputs for the bindings of this class must be done in other objects.
@@ -16,12 +18,12 @@ public class Board {
     /**
      * Counter to keep track of the number of halfmoves made.
      */
-    private byte halfmove;
+    private int halfmove;
 
     /**
      * Counter to keep track of the number of fullmoves made.
      */
-    private byte fullmove;
+    private int fullmove;
 
     /**
      * Whether or not the major team (i.e.: white) is currently moving.
@@ -134,6 +136,139 @@ public class Board {
      */
     public byte getCastles() {
         return castles;
+    }
+
+    /**
+     * Restores the board state given the memento string.
+     * 
+     * @param memento the FEN of the board to restore.
+     */
+    public void restore(String memento) {
+        // Step 0: Break the string down into parts.
+        // Ideally, this should equal 6 parts.
+        String[] parts = memento.split(" ");
+
+        if (parts.length != 6)
+            throw new IllegalArgumentException("FEN invalid!");
+
+        // Step 1: Restore the board positions
+        String[] ranks = parts[0].split("/");
+
+        for(int i = 0; i < 8; i++) {
+           String curRank = ranks[i];
+
+            int j = 0;
+            for (char c : curRank.toCharArray()) {
+                if (Character.isDigit(c)) {
+                    int nSpaces = Integer.parseInt("" + c);
+                    for (int k = 0; k < nSpaces; k++) {
+                        BOARD[i][j] = ' ';
+                        j++;
+                    }
+                } else
+                    BOARD[i][j] = c;
+            }
+        }
+
+        // Step 2: Restore current turn
+        isMajorTurn = "w".equals(parts[1]);
+
+        // Step 3: Restore castling abilities
+        if ("-".equals(parts[2]))
+            castles = 0x0;
+        else
+            castles = (byte)( 
+                (parts[2].contains("K") ? 0x8 : 0) + 
+                (parts[2].contains("Q") ? 0x4 : 0) +   
+                (parts[2].contains("k") ? 0x2 : 0) + 
+                (parts[2].contains("q") ? 0x1 : 0)
+            );   
+
+        // Step 4: Restore en passant tile
+        if ("-".equals(parts[3])) {
+            enPassant = -1;
+        } else {
+            int[] loc = AlgebraicNotation.fromAN(parts[3]);
+
+            enPassant = (byte)(loc[0] - 1 + loc[1] * 8 - 8);
+        }
+
+        // Step 5: Restore halfmove clock
+        halfmove = Integer.parseInt(parts[4]);
+
+        // Step 6: Restore fullmove clock
+        fullmove = Integer.parseInt(parts[5]);
+    }
+
+    /**
+     * Creates a memento of the board.
+     * <p>
+     * This is a string representing the current board state,
+     * which can be used to restore the board to this state.
+     * 
+     * @return the board in Forsyth-Edwards Notation (FEN).
+     */
+    public String createMemento() {
+        StringBuilder ret = new StringBuilder();
+
+        // Step 1: Store the current state of the board positions.
+        for (int i = 0; i < 8; i++) {
+            int nSpaces = 0;
+            for (int j = 0; j < 8; j++) {
+                char c = BOARD[i][j];
+
+                // Anything that isn't a space goes in as-is
+                if (c != ' ') {
+                    if (nSpaces > 0) {
+                        ret.append(nSpaces);
+                        nSpaces = 0;
+                    }
+                    
+                    ret.append(c);
+                } else
+                    nSpaces++;
+            }
+
+            // Append the spaces if there are still spaces
+            if (nSpaces > 0)
+                ret.append(nSpaces);
+            
+            if (i < 7)
+                ret.append('/');
+        }
+        ret.append(" ");
+
+        // Step 2: Store the current turn
+        ret.append(isMajorTurn ? 'w' : 'b');
+        ret.append(" ");
+
+        // Step 3: Store the castling ability
+        if (castles == 0)
+            ret.append('-');
+        else {
+            if ((castles & 0x8) != 0) // Major king side
+                ret.append('K');
+            if ((castles & 0x4) != 0) // Major queen side
+                ret.append('Q');
+            if ((castles & 0x2) != 0) // Minor king side
+                ret.append('k');
+            if ((castles & 0x1) != 0) // Minor queen side
+                ret.append('q');
+        }
+        ret.append(" ");
+
+        // Step 4: Store the en passant location
+        ret.append(enPassant == -1 ? "-" : AlgebraicNotation.toAN(enPassant % 8 + 1, enPassant / 8 + 1));
+        ret.append(" ");
+
+        // Step 5: Store the halfmove clock
+        ret.append(halfmove);
+        ret.append(" ");
+
+        // Step 6: Store the fullmove clock
+        ret.append(fullmove);
+
+        return ret.toString();
     }
 
     /**

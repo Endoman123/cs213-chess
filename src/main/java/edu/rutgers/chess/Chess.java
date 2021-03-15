@@ -1,6 +1,6 @@
 package edu.rutgers.chess;
 
-import edu.rutgers.chess.ChessHandler;
+import edu.rutgers.chess.Board;
 
 /**
  * Main runner class
@@ -10,8 +10,9 @@ import edu.rutgers.chess.ChessHandler;
  */
 public class Chess {
     public static void main(String[] args) {
-        ChessHandler game = new ChessHandler();
+        Board board = new Board();
 
-        System.out.println(game.toString());
+        System.out.println(board.toString());
+        System.out.println(board.createMemento());
     }
 }
