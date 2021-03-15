@@ -75,7 +75,7 @@ public class Moves {
 
         // Quiet move
         if (b.getPiece(file, rank + dir) == ' ') {
-            if (rank == promoRank) {
+            if (rank + dir == promoRank) {
                     ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION));
                     ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_0));
                     ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_1));
@@ -88,7 +88,8 @@ public class Moves {
         if (rank == (isMajor ? 2 : 7) && b.getPiece(file, rank + dir * 2) == ' ')
             ret.add(encodeMove(file, rank, file, rank + dir * 2, SPECIAL_0));
 
-        for (int f = -1; f > 2; f += 2) {
+        // Captures
+        for (int f = -1; f < 2; f += 2) {
             if (file + f <= 8 && file + f >= 1) {
                 char other = b.getPiece(file + f, rank + dir);
 
@@ -96,9 +97,9 @@ public class Moves {
                 if ("Kk".contains("" + other))
                     continue;
 
-                // Capture
+                // Basic capture
                 if (isMajor != Character.isUpperCase(other)) {
-                    if (rank == promoRank) {
+                    if (rank + dir == promoRank) {
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION));
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_0));
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1));
@@ -107,7 +108,7 @@ public class Moves {
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE));
                 }
 
-                // En Passant Capture
+                // En Passant capture
                 else if (b.getEnPassant() == file + f + rank * 8 + dir * 8)
                     ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | SPECIAL_0));
             }
