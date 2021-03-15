@@ -146,6 +146,13 @@ public class Board {
 
         // Step 3: Move our piece
         BOARD[to[1] - 1][to[0] - 1] = piece;
+
+        // Step 4: Flip the turn
+        isMajorTurn = !isMajorTurn;
+
+        // Step 5: Increment the fullmove counter
+        if (isMajorTurn)
+            fullmove++;
     }
 
     /**
