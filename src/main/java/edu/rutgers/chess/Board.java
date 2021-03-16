@@ -106,7 +106,7 @@ public class Board {
         char piece = getPiece(from[0], from[1]);
 
         if (Character.isUpperCase(piece) != isMajorTurn)
-            throw new IllegalArgumentException("Wrong turn!");
+            throw new IllegalArgumentException("Wrong turn! Piece selected: " + piece);
 
         // Step 1: Remove our piece from the board.
         BOARD[from[1] - 1][from[0] - 1] = ' ';
@@ -226,7 +226,7 @@ public class Board {
         String[] ranks = parts[0].split("/");
 
         for(int i = 0; i < 8; i++) {
-           String curRank = ranks[i];
+            String curRank = ranks[i];
 
             int j = 0;
             for (char c : curRank.toCharArray()) {
@@ -236,8 +236,10 @@ public class Board {
                         BOARD[i][j] = ' ';
                         j++;
                     }
-                } else
+                } else {
                     BOARD[i][j] = c;
+                    j++;
+                }
             }
         }
 
