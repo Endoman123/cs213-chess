@@ -128,14 +128,32 @@ public class Moves {
      */
     private static String[] filterIllegalMoves(Board b, int file, int rank, ArrayList<String> curList) {
         int i = 0;
+        int kingPos = 0;
+        long attackedTiles = 0;
+        boolean isMajor = Character.isUpperCase(b.getPiece(file, rank));
+        String memento = b.createMemento();
 
-        while (i < curList.size()) {
-            // TODO: Move and restore
-            i++;
+        // Step 1: Get the king's position
+        for (kingPos = 0; kingPos < 64; kingPos++) {
+            if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == (isMajor ? 'K' : 'k'))
+                break;
         }
 
+        System.out.println(kingPos);
+
+        // Step 2: Test all moves to see if the king is attacked in any of them
+        while (i < curList.size()) {
+            b.doMove(curList.get(i));
+            attackedTiles = Bitboards.getAttackedTiles(b, isMajor);
+            if ((attackedTiles & (1L << kingPos)) != 0)
+                curList.remove(i);
+            else
+                i++;
+            b.restore(memento); 
+        }
         return curList.toArray(new String[0]);
     }
+
 
     /**
      * Creates an encoded move based on the location and flags passed.
