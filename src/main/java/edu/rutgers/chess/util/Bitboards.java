@@ -72,7 +72,9 @@ public class Bitboards {
             if (Character.isUpperCase(b.getPiece(file, rank)) == isMajor)
                 continue;
 
-            if (isAttackedByPawn(b, file, rank, isMajor))
+            if (
+                isAttackedByPawn(b, file, rank, isMajor) || 
+                isAttackedByKing(b, file, rank, isMajor))
                 ret |= (1L << i);
         }
 
@@ -90,7 +92,6 @@ public class Bitboards {
      *                false otherwise
      */
     public static boolean isAttackedByPawn(Board b, int file, int rank, boolean isMajor) {
-        boolean ret = false;
         char attackingPiece = isMajor ? 'P' : 'p';
         int dir = isMajor ? 1 : -1;
         int safeRank = isMajor ? 1 : 8;
@@ -99,12 +100,49 @@ public class Bitboards {
         if (rank == safeRank)
             return false;
 
-        if (file + 1 <= 8)
-            ret |= b.getPiece(file + 1, rank - dir) == attackingPiece;
+        if (file + 1 <= 8 && b.getPiece(file + 1, rank - dir) == attackingPiece)
+            return true;
 
-        if (file - 1 >= 1)
-            ret |= b.getPiece(file - 1, rank - dir) == attackingPiece;
+        if (file - 1 >= 1 && b.getPiece(file - 1, rank - dir) == attackingPiece)
+            return true;
 
-        return ret;
+        return false;
+    }
+
+    /**
+     * Get whether or not a position is being attacked by a king.
+     * 
+     * @param b       the board context to test
+     * @param file    the file to test
+     * @param rank    the rank to test
+     * @param isMajor whether or not the attacking piece is major
+     * @return        true if the tile is at risk of being attacked by a pawn,
+     *                false otherwise
+     */
+    public static boolean isAttackedByKing(Board b, int file, int rank, boolean isMajor) {
+        char attackingPiece = isMajor ? 'K' : 'k';
+        int dir = isMajor ? 1 : -1;
+        int safeRank = isMajor ? 1 : 8;
+
+        // Kings can only attack pieces directly adjacent to them, simply check your surrounding area.
+        for (int f = -1; f < 2; f++) {
+            for (int r = -1; r < 2; r++) {
+                // Don't check the same tile the king is on
+                if (f == 0 && r == 0)
+                    continue;
+               
+                // Make sure the tile is in range
+                if (file + f < 1 || file + f > 8)
+                    continue;
+
+                if (rank + r < 1 || rank + r > 8)
+                    continue;
+
+                if (b.getPiece(file + f, rank + r) == attackingPiece)
+                    return true;
+            }
+        }
+
+        return false;
     }
 }
