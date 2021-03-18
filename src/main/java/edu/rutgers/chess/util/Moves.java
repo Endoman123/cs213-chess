@@ -72,17 +72,18 @@ public class Moves {
                 String[] moves = new String[1];
                 switch(Character.toUpperCase(c)) {
                     case 'B':
-                        moves = gen_pawn_moves(b, file, rank);
+                        moves = getPawnMoves(b, file, rank);
                     break;
                     case 'K':
-                        moves = gen_king_moves(b, file, rank);
+                        moves = getKingMoves(b, file, rank);
                     break;
                     case 'N':
+                        moves = getKnightMoves(b, file, rank);
                     break;
                     case 'O':
                     break;
                     case 'P':
-                        moves = gen_pawn_moves(b, file, rank);
+                        moves = getPawnMoves(b, file, rank);
                     break;
                     case 'Q':
                     break;
@@ -107,7 +108,7 @@ public class Moves {
      * @param rank the rank of the pawn
      * @return     a list of moves that this pawn can make.
      */
-    private static String[] gen_pawn_moves(Board b, int file, int rank) {
+    private static String[] getPawnMoves(Board b, int file, int rank) {
         ArrayList<String> ret = new ArrayList<String>();
         char piece = b.getPiece(file, rank);
 
@@ -173,7 +174,7 @@ public class Moves {
      * @param rank the rank of the knight
      * @return     a list of moves that this knight can make.
      */
-    public static String[] gen_knight_moves(Board b, int file, int rank) {
+    public static String[] getKnightMoves(Board b, int file, int rank) {
         ArrayList<String> ret = new ArrayList<String>();
         char piece = b.getPiece(file, rank);
         boolean isMajor = Character.isUpperCase(piece);
@@ -205,6 +206,7 @@ public class Moves {
 
         return filterIllegalMoves(b, file, rank, ret);
     }
+
     /**
      * Generates king moves for the given tile.
      * 
@@ -213,7 +215,7 @@ public class Moves {
      * @param rank the rank of the king
      * @return     a list of moves that this king can make.
      */
-    public static String[] gen_king_moves(Board b, int file, int rank) {
+    public static String[] getKingMoves(Board b, int file, int rank) {
         ArrayList<String> ret = new ArrayList<String>();
         char piece = b.getPiece(file, rank);
         boolean isMajor = Character.isUpperCase(piece);
