@@ -256,6 +256,7 @@ public class Moves {
 
         return filterIllegalMoves(b, file, rank, ret);
     }
+
     /**
      * Generates king moves for the given tile.
      * 
