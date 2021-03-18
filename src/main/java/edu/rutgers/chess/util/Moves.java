@@ -185,7 +185,7 @@ public class Moves {
         for (int f = -1; f < 2; f++)  {
             for (int r = -1; r < 2; r++) {
                 // Don't check the same tile the king is on
-                if (file == f && rank == r)
+                if (f == 0 && r == 0)
                     continue;
                
                 // Make sure the tile is in range
@@ -241,11 +241,12 @@ public class Moves {
         int kingPos = 0;
         long attackedTiles = 0;
         boolean isMajor = Character.isUpperCase(b.getPiece(file, rank));
+        char curKing = isMajor ? 'K' : 'k';
         String memento = b.createMemento();
 
         // Step 1: Get the king's position
         for (kingPos = 0; kingPos < 64; kingPos++) {
-            if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == (isMajor ? 'K' : 'k'))
+            if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == curKing)
                 break;
         }
 
