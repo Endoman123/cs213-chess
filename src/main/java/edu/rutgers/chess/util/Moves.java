@@ -72,15 +72,13 @@ public class Moves {
                 String[] moves = new String[1];
                 switch(Character.toUpperCase(c)) {
                     case 'B':
-                        moves = getPawnMoves(b, file, rank);
+                        moves = getBishopMoves(b, file, rank);
                     break;
                     case 'K':
                         moves = getKingMoves(b, file, rank);
                     break;
                     case 'N':
                         moves = getKnightMoves(b, file, rank);
-                    break;
-                    case 'O':
                     break;
                     case 'P':
                         moves = getPawnMoves(b, file, rank);
@@ -202,6 +200,56 @@ public class Moves {
 
                 if (other == ' ' || Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
                     ret.add(encodeMove(file, rank, file + f, rank - r, other == ' ' ? QUIET : CAPTURE));
+            }
+        }
+
+        return filterIllegalMoves(b, file, rank, ret);
+    }
+
+    /**
+     * Generates bishop moves for the given tile.
+     * 
+     * @param b    the board context for the bishop
+     * @param file the file of the bishop
+     * @param rank the rank of the bishop
+     * @return     a list of moves that this bishop can make.
+     */
+    public static String[] getBishopMoves(Board b, int file, int rank) {
+        ArrayList<String> ret = new ArrayList<String>();
+        char piece = b.getPiece(file, rank);
+        boolean isMajor = Character.isUpperCase(piece);
+
+        if (!"Bb".contains("" + piece))
+            throw new IllegalArgumentException("Location does not refer to a bishop!");
+
+        // Check the 4 diagonals around the bishop
+        // and perform a "raytrace" to the nearest piece.
+        char other;
+        for (int f = -1; f < 2; f += 2)  {
+            for (int r = -1; r < 2; r += 2) {
+                // Skip [0, 0] as it is redundant
+                if (f == 0 && r == 0)
+                    continue;
+               
+                int toFile = file;
+                int toRank = rank;
+
+                do {
+                    toFile += f;
+                    toRank += r;
+
+                    // Check if we are out of range
+                    if (toFile < 1 || toFile > 8 || toRank < 1 || toRank > 8)
+                        break;
+                    
+                    other = b.getPiece(toFile, toRank);
+
+                    if (other != ' ' && Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
+                    else
+                        ret.add(encodeMove(file, rank, toFile, toRank, QUIET));
+
+                } while (other == ' ');
             }
         }
 
