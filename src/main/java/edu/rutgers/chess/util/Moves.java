@@ -166,6 +166,46 @@ public class Moves {
     }
 
     /**
+     * Generates knight moves for the given tile.
+     * 
+     * @param b    the board context for the knight
+     * @param file the file of the knight
+     * @param rank the rank of the knight
+     * @return     a list of moves that this knight can make.
+     */
+    public static String[] gen_knight_moves(Board b, int file, int rank) {
+        ArrayList<String> ret = new ArrayList<String>();
+        char piece = b.getPiece(file, rank);
+        boolean isMajor = Character.isUpperCase(piece);
+
+        if (!"Nn".contains("" + piece))
+            throw new IllegalArgumentException("Location does not refer to a knight!");
+
+        // Check two steps in each cardinal direction, then one step in the orthogonal direction
+        for (int f = -2; f < 3; f++) {
+            if (f == 0 || file + f < 1 || file + f > 8)
+                continue;
+
+            int r = Math.abs(f) == 2 ? 1 : 2;
+
+            if (rank + r <= 8) {
+                char other = b.getPiece(file + f, rank + r);
+
+                if (other == ' ' || Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                    ret.add(encodeMove(file, rank, file + f, rank + r, other == ' ' ? QUIET : CAPTURE));
+            }
+
+            if (rank - r >= 1) {
+                char other = b.getPiece(file + f, rank - r);
+
+                if (other == ' ' || Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                    ret.add(encodeMove(file, rank, file + f, rank - r, other == ' ' ? QUIET : CAPTURE));
+            }
+        }
+
+        return filterIllegalMoves(b, file, rank, ret);
+    }
+    /**
      * Generates king moves for the given tile.
      * 
      * @param b    the board context for the king
@@ -196,8 +236,14 @@ public class Moves {
                     continue;
 
                 char other = b.getPiece(file + f, rank + r);
+
+                // Cannot attack kings
+                if (other == (isMajor ? 'k' : 'K'))
+                    continue;
+
                 if (other == ' ')
                     ret.add(encodeMove(file, rank, file + f, rank + r, QUIET));
+
                 else if (Character.isUpperCase(other) != isMajor) 
                     ret.add(encodeMove(file, rank, file + f, rank + r, CAPTURE));
             }
