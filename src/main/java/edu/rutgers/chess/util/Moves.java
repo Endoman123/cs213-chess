@@ -1,6 +1,8 @@
 package edu.rutgers.chess.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.rutgers.chess.Board;
 
@@ -52,6 +54,52 @@ public class Moves {
     private Moves() {}
 
     /**
+     * Generates all available moves given the current context
+     * 
+     * @param b the current board context
+     * @return  all possible moves that can be made
+     */
+    public static String[] gen_moves(Board b) {
+        ArrayList<String> ret = new ArrayList<>();
+        boolean isMajor = b.getIsMajorTurn();
+
+        for(int i = 0; i < 64; i++) {
+            int file = i % 8 + 1;
+            int rank = i / 8 + 1;
+            char c = b.getPiece(file, rank);
+
+            if (c != ' ' && Character.isUpperCase(c) == isMajor) {
+                String[] moves = new String[1];
+                switch(Character.toUpperCase(c)) {
+                    case 'B':
+                        moves = gen_pawn_moves(b, file, rank);
+                    break;
+                    case 'K':
+                        moves = gen_king_moves(b, file, rank);
+                    break;
+                    case 'N':
+                    break;
+                    case 'O':
+                    break;
+                    case 'P':
+                        moves = gen_pawn_moves(b, file, rank);
+                    break;
+                    case 'Q':
+                    break;
+                    case 'R':
+                    break;
+                    default:
+                        throw new IllegalStateException("Illegal character found: " + c);
+                }
+
+                ret.addAll(Arrays.asList(moves));
+            }
+        }
+
+        return ret.toArray(new String[1]);
+    }
+
+    /**
      * Generates pawn moves for the given tile.
      * 
      * @param b    the board context for the pawn
@@ -59,7 +107,7 @@ public class Moves {
      * @param rank the rank of the pawn
      * @return     a list of moves that this pawn can make.
      */
-    public static String[] gen_pawn_moves(Board b, int file, int rank) {
+    private static String[] gen_pawn_moves(Board b, int file, int rank) {
         ArrayList<String> ret = new ArrayList<String>();
         char piece = b.getPiece(file, rank);
 
@@ -118,6 +166,68 @@ public class Moves {
     }
 
     /**
+     * Generates king moves for the given tile.
+     * 
+     * @param b    the board context for the king
+     * @param file the file of the king
+     * @param rank the rank of the king
+     * @return     a list of moves that this king can make.
+     */
+    public static String[] gen_king_moves(Board b, int file, int rank) {
+        ArrayList<String> ret = new ArrayList<String>();
+        char piece = b.getPiece(file, rank);
+        boolean isMajor = Character.isUpperCase(piece);
+
+        if (!"Kk".contains("" + piece))
+            throw new IllegalArgumentException("Location does not refer to a king!");
+
+        // Check the 8 squares around the king and make sure they are spaces the king can even move to.
+        for (int f = -1; f < 2; f++)  {
+            for (int r = -1; r < 2; r++) {
+                // Don't check the same tile the king is on
+                if (file == f && rank == r)
+                    continue;
+               
+                // Make sure the tile is in range
+                if (file + f < 1 || file + f > 8)
+                    continue;
+
+                if (rank + r < 1 || rank + r > 8)
+                    continue;
+
+                char other = b.getPiece(file + f, rank + r);
+                if (other == ' ')
+                    ret.add(encodeMove(file, rank, file + f, rank + r, QUIET));
+                else if (Character.isUpperCase(other) != isMajor) 
+                    ret.add(encodeMove(file, rank, file + f, rank + r, CAPTURE));
+            }
+        }
+        
+        // Every castle has four conditions:
+        // 1) The king and the rook may not have moved from their starting squares if you want to castle.
+        // 2) All spaces between the king and the rook must be empty.
+        // 3) The king cannot be in check.
+        // 4) The squares that the king passes over must not be under attack, nor the square where it lands on.
+        if (isMajor && (b.getCastles() & 0x8) != 0 || (b.getCastles() & 0x2) != 0) { // King side castle
+            long testCheck = (0b00001110L << (rank * 8));
+            long testEmpty = (0b00000110L << (rank * 8));
+
+            if ((Bitboards.getAttackedTiles(b, isMajor) & testCheck) == 0 && 
+                (Bitboards.getOccupied(b) & testEmpty) == 0)
+                    ret.add(encodeMove(file, rank, file + 2, rank, SPECIAL_1));
+        } if (isMajor && (b.getCastles() & 0x4) != 0 || (b.getCastles() & 0x1) != 0) { // Queen side castle
+            long testCheck = (0b00111000L << (rank * 8));
+            long testEmpty = (0b01110000L << (rank * 8));
+
+            if ((Bitboards.getAttackedTiles(b, isMajor) & testCheck) == 0 && 
+                (Bitboards.getOccupied(b) & testEmpty) == 0)
+                ret.add(encodeMove(file, rank, file - 2, rank, SPECIAL_1 | SPECIAL_0));
+        }
+
+        return filterIllegalMoves(b, file, rank, ret);
+    }
+
+    /**
      * Filter moves that would be considered illegal due to the move leaving the king in check.
      * 
      * @param b       the board context to test on
@@ -138,8 +248,6 @@ public class Moves {
             if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == (isMajor ? 'K' : 'k'))
                 break;
         }
-
-        System.out.println(kingPos);
 
         // Step 2: Test all moves to see if the king is attacked in any of them
         while (i < curList.size()) {

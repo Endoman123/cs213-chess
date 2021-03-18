@@ -13,11 +13,53 @@ import edu.rutgers.chess.Board;
  */
 public class Bitboards {
     /**
+     * Get all occupied tiles.
+     * 
+     * @param b       the board context to test on
+     * @return        a 64-bit bitboard representing tiles occupied by a piece
+     */
+    public static long getOccupied(Board b) {
+        long ret = 0L;
+
+        for (int i = 0; i < 64; i++) {
+            int file = i % 8 + 1;
+            int rank = i / 8 + 1;
+
+            if (b.getPiece(file, rank) != ' ')
+                ret |= (1L << i);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Get all the tiles that are occupied by the specified team.
+     * 
+     * @param b       the board context to test on
+     * @param isMajor whether or not the team is major or minor
+     * @return        a 64-bit bitboard representing tiles occupied by the specified team
+     */
+    public static long getTeamTiles(Board b, boolean isMajor) {
+        long ret = 0L;
+
+        for (int i = 0; i < 64; i++) {
+            int file = i % 8 + 1;
+            int rank = i / 8 + 1;
+            char c = b.getPiece(file, rank);
+
+            if (c != ' ' && Character.isUpperCase(c) == isMajor)
+                ret |= (1L << i);
+        }
+
+        return ret;
+    }
+
+    /**
      * Get all the tiles that are in range of an attack by the specified team.
      * 
      * @param b       the board context to test on
      * @param isMajor whether or not the attacking team is major or minor
-     * @return        a 64-bit bitboard representing attacked tiles, ordered from a1 to h8
+     * @return        a 64-bit bitboard representing attacked tiles
      */
     public static long getAttackedTiles(Board b, boolean isMajor) {
         long ret = 0L;
