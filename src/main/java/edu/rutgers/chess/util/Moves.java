@@ -59,7 +59,7 @@ public class Moves {
      * @param b the current board context
      * @return  all possible moves that can be made
      */
-    public static String[] gen_moves(Board b) {
+    public static String[] getMoves(Board b) {
         ArrayList<String> ret = new ArrayList<>();
         boolean isMajor = b.getIsMajorTurn();
 
@@ -87,6 +87,7 @@ public class Moves {
                         moves = getQueenMoves(b, file, rank);
                     break;
                     case 'R':
+                        moves = getRookMoves(b, file, rank);
                     break;
                     default:
                         throw new IllegalStateException("Illegal character found: " + c);
@@ -200,6 +201,60 @@ public class Moves {
 
                 if (other == ' ' || Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
                     ret.add(encodeMove(file, rank, file + f, rank - r, other == ' ' ? QUIET : CAPTURE));
+            }
+        }
+
+        return filterIllegalMoves(b, file, rank, ret);
+    }
+
+    /**
+     * Generates rook moves for the given tile.
+     * 
+     * @param b    the board context for the rook
+     * @param file the file of the rook
+     * @param rank the rank of the rook
+     * @return     a list of moves that this rook can make.
+     */
+    public static String[] getRookMoves(Board b, int file, int rank) {
+        ArrayList<String> ret = new ArrayList<String>();
+        char piece = b.getPiece(file, rank);
+        boolean isMajor = Character.isUpperCase(piece);
+
+        if (!"Rr".contains("" + piece))
+            throw new IllegalArgumentException("Location does not refer to a rook!");
+
+        // Check the 4 cardinal directions around the rook
+        // and perform a "raytrace" to the nearest piece.
+        char other;
+        for (int f = -1; f < 2; f += 2)  {
+            for (int r = -1; r < 2; r += 2) {
+                // Skip [0, 0] as it is redundant
+                if (f == 0 && r == 0)
+                    continue;
+
+                // Skip diagonals
+                if (f != 0 && r != 0)
+                    continue; 
+
+                int toFile = file;
+                int toRank = rank;
+
+                do {
+                    toFile += f;
+                    toRank += r;
+
+                    // Check if we are out of range
+                    if (toFile < 1 || toFile > 8 || toRank < 1 || toRank > 8)
+                        break;
+                    
+                    other = b.getPiece(toFile, toRank);
+
+                    if (other != ' ' && Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
+                    else
+                        ret.add(encodeMove(file, rank, toFile, toRank, QUIET));
+
+                } while (other == ' ');
             }
         }
 

@@ -26,6 +26,6 @@ public class Chess {
        });
 
         System.out.println(board.toString());
-        System.out.println(Arrays.toString(Moves.gen_pawn_moves(board, 6, 2)));
+        System.out.println(Arrays.toString(Moves.getMoves(board)));
     }
 }
