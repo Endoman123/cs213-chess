@@ -129,7 +129,7 @@ public class Board {
 
         if ((flags & Moves.PROMOTION) != 0) { // Promotion, change piece to whatever they choose.
             // Move the flag two bits over in case this is a capture.
-            switch (flags >> 2) {
+            switch (flags >>> 2) {
                 case Moves.QUIET:
                     piece = isMajorTurn ? 'N' : 'n';
                     break;
@@ -142,7 +142,7 @@ public class Board {
             }
         }
 
-        if ((flags & Moves.CAPTURE) == 0 && (flags & Moves.SPECIAL_1) != 0) { // Castle
+        if ((flags & Moves.CAPTURE & Moves.PROMOTION) == 0 && (flags & Moves.SPECIAL_1) != 0) { // Castle
             boolean kingCastle = (flags & Moves.SPECIAL_0) == 0;
 
             BOARD[to[1] - 1][kingCastle ? 0 : 7] = ' ';
