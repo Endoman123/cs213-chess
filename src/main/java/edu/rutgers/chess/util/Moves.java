@@ -249,10 +249,10 @@ public class Moves {
                     
                     other = b.getPiece(toFile, toRank);
 
-                    if (other != ' ' && Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
-                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
-                    else
+                    if (other == ' ')
                         ret.add(encodeMove(file, rank, toFile, toRank, QUIET));
+                    else if (Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
 
                 } while (other == ' ');
             }
@@ -299,10 +299,10 @@ public class Moves {
                     
                     other = b.getPiece(toFile, toRank);
 
-                    if (other != ' ' && Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
-                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
-                    else
+                    if (other == ' ')
                         ret.add(encodeMove(file, rank, toFile, toRank, QUIET));
+                    else if (Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
 
                 } while (other == ' ');
             }
@@ -348,10 +348,10 @@ public class Moves {
                     
                     other = b.getPiece(toFile, toRank);
 
-                    if (other != ' ' && Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
-                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
-                    else
+                    if (other == ' ')
                         ret.add(encodeMove(file, rank, toFile, toRank, QUIET));
+                    else if (Character.isUpperCase(other) != isMajor && Character.toUpperCase(other) != 'K')
+                        ret.add(encodeMove(file, rank, toFile, toRank, CAPTURE));
 
                 } while (other == ' ');
             }
