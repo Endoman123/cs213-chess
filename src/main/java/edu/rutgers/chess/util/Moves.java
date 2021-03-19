@@ -450,13 +450,16 @@ public class Moves {
         // Step 2: Test all moves to see if the king is attacked in any of them
         while (i < curList.size()) {
             b.doMove(curList.get(i));
-            attackedTiles = Bitboards.getAttackedTiles(b, isMajor);
+            attackedTiles = Bitboards.getAttackedTiles(b, !isMajor);
+
             if ((attackedTiles & (1L << kingPos)) != 0)
                 curList.remove(i);
             else
                 i++;
+
             b.restore(memento); 
         }
+
         return curList.toArray(new String[0]);
     }
 
