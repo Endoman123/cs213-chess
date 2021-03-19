@@ -175,20 +175,6 @@ public class Board {
     }
 
     /**
-     * Gets if the current king is in check
-     * 
-     * @return whether or not the active king is in check
-     */
-    public boolean getInCheck() {
-        // Find the king
-        char king = isMajorTurn ? 'K' : 'k';
-        int kingLoc; 
-
-        for (kingLoc = 0; BOARD[kingLoc / 8][kingLoc % 8] == king; kingLoc++);
-
-    }
-
-    /**
      * Gets whether or not it is the major team's turn.
      * 
      * @return {@code true} if it is major team's turn,
