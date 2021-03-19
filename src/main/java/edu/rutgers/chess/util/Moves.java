@@ -125,10 +125,10 @@ public class Moves {
         // Quiet move
         if (b.getPiece(file, rank + dir) == ' ') {
             if (rank + dir == promoRank) {
-                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION));
-                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_0));
-                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_1));
                     ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_1 | SPECIAL_0));
+                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_1));
+                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION | SPECIAL_0));
+                    ret.add(encodeMove(file, rank, file, rank + dir, PROMOTION));
             } else
                 ret.add(encodeMove(file, rank, file, rank + dir, QUIET));
         }
@@ -149,10 +149,10 @@ public class Moves {
                 // Basic capture
                 if (isMajor != Character.isUpperCase(other)) {
                     if (rank + dir == promoRank) {
-                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION));
-                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_0));
-                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1));
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1 | SPECIAL_0));
+                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1));
+                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_0));
+                        ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION));
                     } else
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE));
                 }
