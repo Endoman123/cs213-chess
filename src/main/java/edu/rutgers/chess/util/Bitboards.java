@@ -206,21 +206,28 @@ public class Bitboards {
         return ret;
     }
 
-    public static void printBitboard(Long bb) {
-        StringBuilder build = new StringBuilder(Long.toBinaryString(bb));
+    /**
+     * Output a bitboard as a string.
+     * 
+     * @param bb the bitboard to convert to a string
+     * @return   the bitboard as a string of 1s and 0s,
+     *           formatted as a 8x8 board
+     */
+    public static String toString(Long bb) {
+        StringBuilder ret = new StringBuilder(Long.toBinaryString(bb));
 
-        while (build.length() < 64) {
-            build.insert(0, "0");
+        while (ret.length() < 64) {
+            ret.insert(0, "0");
         }
 
-        build.insert(56, System.lineSeparator());
-        build.insert(48, System.lineSeparator());
-        build.insert(40, System.lineSeparator());
-        build.insert(32, System.lineSeparator());
-        build.insert(24, System.lineSeparator());
-        build.insert(16, System.lineSeparator());
-        build.insert(8, System.lineSeparator());
+        ret.insert(56, System.lineSeparator());
+        ret.insert(48, System.lineSeparator());
+        ret.insert(40, System.lineSeparator());
+        ret.insert(32, System.lineSeparator());
+        ret.insert(24, System.lineSeparator());
+        ret.insert(16, System.lineSeparator());
+        ret.insert(8, System.lineSeparator());
 
-        System.out.println(build.toString());
+        return ret.toString();
     }
 }
