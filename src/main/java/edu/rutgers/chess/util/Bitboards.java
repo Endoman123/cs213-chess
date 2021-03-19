@@ -15,8 +15,8 @@ public class Bitboards {
     /**
      * Get all occupied tiles.
      * 
-     * @param b       the board context to test on
-     * @return        a 64-bit bitboard representing tiles occupied by a piece
+     * @param b the board context to test on
+     * @return  a 64-bit bitboard representing tiles occupied by a piece
      */
     public static long getOccupied(Board b) {
         long ret = 0L;
@@ -55,8 +55,32 @@ public class Bitboards {
     }
 
     /**
-     * Get all the tiles that are in range of an attack by the specified team.
+     * Get all the tiles that are occupied by the given piece.
      * 
+     * @param b the board context to test on
+     * @param c the piece to look for, case insenstivie
+     * @return  a 64-bit bitboard representing tiles occupied by piece {@code c}
+     */
+    public static long getOccupiedBy(Board b, char c) {
+        long ret = 0L;
+
+        for (int i = 0; i < 64; i++) {
+            int file = i % 8 + 1;
+            int rank = i / 8 + 1;
+            char piece = b.getPiece(file, rank);
+
+            if (Character.toUpperCase(c) == Character.toUpperCase(piece))
+                ret |= (1L << i);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Get all the tiles that are in range of an attack by the specified team.
+     * <p>
+     * Note that this will count tiles occupied by the same team that are in the path of attack.
+     *  
      * @param b       the board context to test on
      * @param isMajor whether or not the attacking team is major or minor
      * @return        a 64-bit bitboard representing attacked tiles
@@ -67,82 +91,120 @@ public class Bitboards {
         for (int i = 0; i < 64; i++) {
             int file = i % 8 + 1;
             int rank = i / 8 + 1;
+            char piece = b.getPiece(file, rank);
 
-            // Skip pieces on the same team.
-            if (Character.isUpperCase(b.getPiece(file, rank)) == isMajor)
-                continue;
+            if (piece != ' ' && Character.isUpperCase(piece) == isMajor) {
+                long occupied = getOccupied(b);
+                switch(Character.toUpperCase(piece)) {
+                    case 'B':
+                        for (int f = -1; f < 2; f += 2) {
+                            for (int r = -1; r < 2; r += 2) {
+                                int curFile = file - 1;
+                                int curRank = rank - 1;
+                                long curTile;
 
-            if (
-                isAttackedByPawn(b, file, rank, isMajor) || 
-                isAttackedByKing(b, file, rank, isMajor))
-                ret |= (1L << i);
-        }
+                                do {
+                                    curFile += f;
+                                    curRank += r;
 
-        return ret;
-    }
+                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                        break;
 
-    /**
-     * Get whether or not a position is being attacked by a pawn.
-     * 
-     * @param b       the board context to test
-     * @param file    the file to test
-     * @param rank    the rank to test
-     * @param isMajor whether or not the attacking piece is major
-     * @return        true if the tile is at risk of being attacked by a pawn,
-     *                false otherwise
-     */
-    public static boolean isAttackedByPawn(Board b, int file, int rank, boolean isMajor) {
-        char attackingPiece = isMajor ? 'P' : 'p';
-        int dir = isMajor ? 1 : -1;
-        int safeRank = isMajor ? 1 : 8;
+                                    curTile = (1L << curFile + curRank * 8);
+                                    ret |= curTile;
+                                } while ((occupied & curTile) == 0);
+                            }
+                        }
+                    break;
+                    case 'K':
+                        for (int f = -1; f < 2; f++) {
+                            if (file + f > 8 || file + f < 1)
+                                continue;
 
-        // If we are out of the way of any pawn, we are safe.
-        if (rank == safeRank)
-            return false;
+                            for (int r = -1; r < 2; r++) {
+                                if (f == 0 && r == 0)
+                                    continue;
 
-        if (file + 1 <= 8 && b.getPiece(file + 1, rank - dir) == attackingPiece)
-            return true;
+                                if (rank + r > 8 || rank + r < 1)
+                                    continue;
 
-        if (file - 1 >= 1 && b.getPiece(file - 1, rank - dir) == attackingPiece)
-            return true;
+                                ret |= (1L << file + f + rank * 8 + r * 8 - 9);
+                            }
+                        }
+                    break;
+                    case 'N':
+                        for (int f = -2; f < 3; f++) {
+                            if (file + f > 8 || file + f < 1 || f == 0)
+                                continue;
 
-        return false;
-    }
+                            int r = Math.abs(f) == 2 ? 1 : 2;
 
-    /**
-     * Get whether or not a position is being attacked by a king.
-     * 
-     * @param b       the board context to test
-     * @param file    the file to test
-     * @param rank    the rank to test
-     * @param isMajor whether or not the attacking piece is major
-     * @return        true if the tile is at risk of being attacked by a pawn,
-     *                false otherwise
-     */
-    public static boolean isAttackedByKing(Board b, int file, int rank, boolean isMajor) {
-        char attackingPiece = isMajor ? 'K' : 'k';
-        int dir = isMajor ? 1 : -1;
-        int safeRank = isMajor ? 1 : 8;
+                            if (rank + r <= 8)
+                                ret |= (1L << file + f + rank * 8 + r * 8 - 9);
+                            if (rank - r >= 1)
+                                ret |= (1L << file + f + rank * 8 - r * 8 - 9);
+                        }
+                    break;
+                    case 'P':
+                        int dir = isMajor ? 1 : -1;
 
-        // Kings can only attack pieces directly adjacent to them, simply check your surrounding area.
-        for (int f = -1; f < 2; f++) {
-            for (int r = -1; r < 2; r++) {
-                // Don't check the same tile the king is on
-                if (f == 0 && r == 0)
-                    continue;
-               
-                // Make sure the tile is in range
-                if (file + f < 1 || file + f > 8)
-                    continue;
+                        if (file + dir <= 8 || file + dir >= 1) {
+                            if (rank + 1 <= 8)
+                                ret |= (1L << file + dir + rank * 8 - 1);
+                            if (rank - 1 >= 1)
+                                ret |= (1L << file + dir + rank * 8 - 17);
+                        }
+                    break;
+                    case 'R':
+                        for (int f = -1; f < 2; f++) {
+                            for (int r = -1; r < 2; r++) {
+                                if (Math.abs(f) == Math.abs(r))
+                                    continue;
 
-                if (rank + r < 1 || rank + r > 8)
-                    continue;
+                                int curFile = file - 1;
+                                int curRank = rank - 1;
+                                long curTile;
 
-                if (b.getPiece(file + f, rank + r) == attackingPiece)
-                    return true;
+                                do {
+                                    curFile += f;
+                                    curRank += r;
+
+                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                        break;
+
+                                    curTile = (1L << curFile + curRank * 8);
+                                    ret |= curTile;
+                                } while ((occupied & curTile) == 0);
+                            }
+                        }
+                    break;
+                    case 'Q':
+                        for (int f = -1; f < 2; f++) {
+                            for (int r = -1; r < 2; r++) {
+                                if (f == 0 && r == 0)
+                                    continue;
+
+                                int curFile = file - 1;
+                                int curRank = rank - 1;
+                                long curTile;
+
+                                do {
+                                    curFile += f;
+                                    curRank += r;
+
+                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                        break;
+
+                                    curTile = (1L << curFile + curRank * 8);
+                                    ret |= curTile;
+                                } while ((occupied & curTile) == 0);
+                            }
+                        }
+                    break;
+                }
             }
         }
 
-        return false;
+        return ret;
     }
 }
