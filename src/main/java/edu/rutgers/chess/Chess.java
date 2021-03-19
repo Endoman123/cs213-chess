@@ -49,8 +49,10 @@ public class Chess {
             }
 
             while (move == null) {
-                System.out.println(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
+                // Bitboards.printBitboard(Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()));
+                System.out.print(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
                 String[] inputs = s.nextLine().split(" ");
+                String testMove = "";
 
                 // Input won't be any more than 4 tokens
                 if (inputs.length > 0 && inputs.length < 5) {
@@ -64,13 +66,23 @@ public class Chess {
                             break;
                         }
                     } else { // Parse move otherwise
-                        move = inputs[0] + " " + inputs[1];
-                        if ("BNRQ".contains(inputs[2]))
-                            move += getPromoCode(inputs[0], inputs[1], inputs[2]);
+                        testMove = inputs[0] + " " + inputs[1];
+
+                        // Check input for promotion
+                        if (inputs.length > 2 && "BNRQ".contains(inputs[2]))
+                            testMove += " " + getPromoCode(inputs[0], inputs[1], inputs[2]);
 
                         // Check if asking for a draw
                         if ("draw?".equals(inputs[inputs.length - 1]))
                             askDraw = true;
+                    }
+                }
+
+                // Attempt to find a best-fit move
+                for (String m : moves) {
+                    if (m.equals(testMove) || m.contains(testMove)) { 
+                        move = m;    
+                        break;
                     }
                 }
 
