@@ -107,10 +107,10 @@ public class Bitboards {
                                     curFile += f;
                                     curRank += r;
 
-                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                    if (curFile > 7 || curFile < 0 || curRank > 7 || curRank < 0)
                                         break;
 
-                                    curTile = (1L << curFile + curRank * 8);
+                                    curTile = (1L << (curFile + curRank * 8));
                                     ret |= curTile;
                                 } while ((occupied & curTile) == 0);
                             }
@@ -148,12 +148,10 @@ public class Bitboards {
                     case 'P':
                         int dir = isMajor ? 1 : -1;
 
-                        if (file + dir <= 8 || file + dir >= 1) {
-                            if (rank + 1 <= 8)
-                                ret |= (1L << file + dir + rank * 8 - 1);
-                            if (rank - 1 >= 1)
-                                ret |= (1L << file + dir + rank * 8 - 17);
-                        }
+                        if (file + 1 <= 8)
+                            ret |= (1L << file + rank * 8 + dir * 8 - 8);
+                        if (file - 1 >= 1)
+                            ret |= (1L << file + rank * 8 + dir * 8 - 10);
                     break;
                     case 'R':
                         for (int f = -1; f < 2; f++) {
@@ -169,7 +167,7 @@ public class Bitboards {
                                     curFile += f;
                                     curRank += r;
 
-                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                    if (curFile > 7 || curFile < 0 || curRank > 7 || curRank < 0)
                                         break;
 
                                     curTile = (1L << curFile + curRank * 8);
@@ -192,7 +190,7 @@ public class Bitboards {
                                     curFile += f;
                                     curRank += r;
 
-                                    if (curFile > 8 || curFile < 1 || curRank > 8 || curRank < 1)
+                                    if (curFile > 7 || curFile < 0 || curRank > 7 || curRank < 0)
                                         break;
 
                                     curTile = (1L << curFile + curRank * 8);
@@ -206,5 +204,23 @@ public class Bitboards {
         }
 
         return ret;
+    }
+
+    public static void printBitboard(Long bb) {
+        StringBuilder build = new StringBuilder(Long.toBinaryString(bb));
+
+        while (build.length() < 64) {
+            build.insert(0, "0");
+        }
+
+        build.insert(56, System.lineSeparator());
+        build.insert(48, System.lineSeparator());
+        build.insert(40, System.lineSeparator());
+        build.insert(32, System.lineSeparator());
+        build.insert(24, System.lineSeparator());
+        build.insert(16, System.lineSeparator());
+        build.insert(8, System.lineSeparator());
+
+        System.out.println(build.toString());
     }
 }
