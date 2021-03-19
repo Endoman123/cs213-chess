@@ -118,9 +118,14 @@ public class Board {
             halfmove++;
 
         if (flags == Moves.SPECIAL_0) // Double-pawn push, set en-passant state
-            enPassant = (byte)(to[0] - 1 + to[1] * 8 - 8);
+            enPassant = (byte)(to[0] + to[1] * 8 - 17);
         else
             enPassant = -1;
+
+        if (flags == (Moves.CAPTURE | Moves.SPECIAL_0)) { // En-passant, remove the proper piece from the board
+            int dir = isMajorTurn ? 1 : -1;
+            BOARD[to[1] - 1 - dir][to[0] - 1] = ' ';
+        }
 
         if ((flags & Moves.PROMOTION) != 0) { // Promotion, change piece to whatever they choose.
             // Move the flag two bits over in case this is a capture.
