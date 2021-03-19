@@ -175,6 +175,20 @@ public class Board {
     }
 
     /**
+     * Gets if the current king is in check
+     * 
+     * @return whether or not the active king is in check
+     */
+    public boolean getInCheck() {
+        // Find the king
+        char king = isMajorTurn ? 'K' : 'k';
+        int kingLoc; 
+
+        for (kingLoc = 0; BOARD[kingLoc / 8][kingLoc % 8] == king; kingLoc++);
+
+    }
+
+    /**
      * Gets whether or not it is the major team's turn.
      * 
      * @return {@code true} if it is major team's turn,
@@ -201,12 +215,23 @@ public class Board {
     /**
      * Gets the castling abilities for both teams.
      * 
-     * @return a byte representing the castling abilities as bit flags.
+     * @return a byte representing the castling abilities as bit flags
      * 
      * @see #castles
      */
     public byte getCastles() {
         return castles;
+    }
+
+    /**
+     * Gets the halfmove clock for this board.
+     * 
+     * @return the number of halfmoves made
+     * 
+     * @see #halfmove
+     */
+    public byte getHalfmove() {
+        return halfmove;
     }
 
     /**
