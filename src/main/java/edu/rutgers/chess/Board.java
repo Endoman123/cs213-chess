@@ -230,7 +230,7 @@ public class Board {
      * 
      * @see #halfmove
      */
-    public byte getHalfmove() {
+    public int getHalfmove() {
         return halfmove;
     }
 
