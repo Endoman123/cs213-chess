@@ -38,56 +38,63 @@ public class Chess {
                 break;
             }
 
-            // Checkmate or stalemate, it's one of the two.
-            if (moves.length == 0) {
-                if ((Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()) & Bitboards.getTeamTiles(board, board.getIsMajorTurn()) & Bitboards.getOccupiedBy(board, 'K')) != 0)
+            // Test for check/checkmate
+            if ((Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()) & Bitboards.getTeamTiles(board, board.getIsMajorTurn()) & Bitboards.getOccupiedBy(board, 'K')) != 0) {
+                if (moves.length == 0) {
+                    System.out.println("Checkmate");
                     winner = board.getIsMajorTurn() ? 2 : 1;
-                else
-                    winner = 3;
-                
-                break;
-            }
 
-            while (move == null) {
-                // Bitboards.printBitboard(Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()));
-                System.out.print(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
-                String[] inputs = s.nextLine().split(" ");
-                String testMove = "";
+                    break;
+                } else
+                    System.out.println("Check");
+            }                
 
-                // Input won't be any more than 4 tokens
-                if (inputs.length > 0 && inputs.length < 5) {
-                    // Test for resign or accepting draw
-                    if (inputs.length == 1) {
-                        if ("resign".equals(inputs[0])) {
-                            move = "resign";
-                            break;
-                        } else if (askDraw && "draw".equals(inputs[0])) {
-                            move = "draw";
+            if (moves.length > 0) {
+                while (move == null) {
+                    // Bitboards.printBitboard(Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()));
+                    System.out.print(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
+                    String[] inputs = s.nextLine().split(" ");
+                    String testMove = "";
+
+                    // Input won't be any more than 4 tokens
+                    if (inputs.length > 0 && inputs.length < 5) {
+                        // Test for resign or accepting draw
+                        if (inputs.length == 1) {
+                            if ("resign".equals(inputs[0])) {
+                                move = "resign";
+                                break;
+                            } else if (askDraw && "draw".equals(inputs[0])) {
+                                move = "draw";
+                                break;
+                            }
+                        } else { // Parse move otherwise
+                            testMove = inputs[0] + " " + inputs[1];
+
+                            // Check input for promotion
+                            if (inputs.length > 2 && "BNRQ".contains(inputs[2]))
+                                testMove += " " + getPromoCode(inputs[0], inputs[1], inputs[2]);
+
+                            // Check if asking for a draw
+                            if ("draw?".equals(inputs[inputs.length - 1]))
+                                askDraw = true;
+                        }
+                    }
+
+                    // Attempt to find a best-fit move
+                    for (String m : moves) {
+                        if (m.equals(testMove) || m.contains(testMove)) { 
+                            move = m;    
                             break;
                         }
-                    } else { // Parse move otherwise
-                        testMove = inputs[0] + " " + inputs[1];
-
-                        // Check input for promotion
-                        if (inputs.length > 2 && "BNRQ".contains(inputs[2]))
-                            testMove += " " + getPromoCode(inputs[0], inputs[1], inputs[2]);
-
-                        // Check if asking for a draw
-                        if ("draw?".equals(inputs[inputs.length - 1]))
-                            askDraw = true;
                     }
-                }
 
-                // Attempt to find a best-fit move
-                for (String m : moves) {
-                    if (m.equals(testMove) || m.contains(testMove)) { 
-                        move = m;    
-                        break;
-                    }
+                    if (move == null)
+                        System.out.println("Illegal move, try again");
                 }
-
-                if (move == null)
-                    System.out.println("Illegal move, try again");
+            } else { // Draw due to stalemate
+                System.out.println("Stalemate");
+                winner = 3;
+                break;
             }
 
             switch(move) {
@@ -99,6 +106,7 @@ public class Chess {
                         winner = 3;
                 break;
                 default:
+                    askDraw = false;
                     board.doMove(move);
                 break;
             }
