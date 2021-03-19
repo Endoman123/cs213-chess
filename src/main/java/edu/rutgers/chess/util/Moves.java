@@ -226,15 +226,11 @@ public class Moves {
         // Check the 4 cardinal directions around the rook
         // and perform a "raytrace" to the nearest piece.
         char other;
-        for (int f = -1; f < 2; f += 2)  {
-            for (int r = -1; r < 2; r += 2) {
-                // Skip [0, 0] as it is redundant
-                if (f == 0 && r == 0)
+        for (int f = -1; f < 2; f++)  {
+            for (int r = -1; r < 2; r++) {
+                // Skip diagonals or center
+                if (Math.abs(f) == Math.abs(r))
                     continue;
-
-                // Skip diagonals
-                if (f != 0 && r != 0)
-                    continue; 
 
                 int toFile = file;
                 int toRank = rank;
