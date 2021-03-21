@@ -147,7 +147,7 @@ public class Moves {
                     continue;
 
                 // Basic capture
-                if (isMajor != Character.isUpperCase(other)) {
+                if (other != ' ' && isMajor != Character.isUpperCase(other)) {
                     if (rank + dir == promoRank) {
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1 | SPECIAL_0));
                         ret.add(encodeMove(file, rank, file + f, rank + dir, CAPTURE | PROMOTION | SPECIAL_1));
