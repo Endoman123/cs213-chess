@@ -18,7 +18,7 @@ public class Chess {
     public static void main(String[] args) {
         Board board = new Board();
         Scanner s = new Scanner(System.in);
-        boolean askDraw = false;
+        boolean canDraw = false;
         
         // Winner is determined with one of three values:
         // 1: Major (White)
@@ -31,6 +31,7 @@ public class Chess {
             String move = null; 
 
             System.out.println(board);
+            System.out.println();
 
             // Halfmove clock overrun, out of turns.
             if (board.getHalfmove() >= 100) {
@@ -50,11 +51,15 @@ public class Chess {
             }                
 
             if (moves.length > 0) {
+                boolean requestDraw = false;
+
+                System.out.println(Arrays.toString(moves));
+
                 while (move == null) {
                     // Bitboards.printBitboard(Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()));
                     System.out.print(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
                     String[] inputs = s.nextLine().split(" ");
-                    String testMove = "";
+                    String testMove = null;
 
                     // Input won't be any more than 4 tokens
                     if (inputs.length > 0 && inputs.length < 5) {
@@ -63,7 +68,7 @@ public class Chess {
                             if ("resign".equals(inputs[0])) {
                                 move = "resign";
                                 break;
-                            } else if (askDraw && "draw".equals(inputs[0])) {
+                            } else if (canDraw && "draw".equals(inputs[0])) {
                                 move = "draw";
                                 break;
                             }
@@ -76,20 +81,40 @@ public class Chess {
 
                             // Check if asking for a draw
                             if ("draw?".equals(inputs[inputs.length - 1]))
-                                askDraw = true;
+                                requestDraw = true;
                         }
                     }
 
                     // Attempt to find a best-fit move
-                    for (String m : moves) {
-                        if (m.equals(testMove) || m.contains(testMove)) { 
-                            move = m;    
-                            break;
+                    if (testMove != null) {
+                        for (String m : moves) {
+                            if (m.equals(testMove) || m.contains(testMove)) { 
+                                move = m;    
+                                break;
+                            }
                         }
                     }
 
                     if (move == null)
                         System.out.println("Illegal move, try again");
+                }
+
+                // Perform the move
+                switch(move) {
+                    case "resign":
+                        winner = board.getIsMajorTurn() ? 2 : 1;
+                    break;
+                    case "draw":
+                        if (canDraw)
+                            winner = 3;
+                    break;
+                    default:
+                        if (requestDraw && !canDraw)
+                            canDraw = true;
+                        else
+                            canDraw = false;
+                        board.doMove(move);
+                    break;
                 }
             } else { // Draw due to stalemate
                 System.out.println("Stalemate");
@@ -97,19 +122,8 @@ public class Chess {
                 break;
             }
 
-            switch(move) {
-                case "resign":
-                    winner = board.getIsMajorTurn() ? 2 : 1;
-                break;
-                case "draw":
-                    if (askDraw)
-                        winner = 3;
-                break;
-                default:
-                    askDraw = false;
-                    board.doMove(move);
-                break;
-            }
+            // Extra whitespace for readability
+            System.out.println();
         } while (winner == 0);
 
         switch (winner) {
@@ -123,6 +137,8 @@ public class Chess {
                 System.out.println("Draw");
             break;
         }
+
+        s.close();
     }
 
     /**
