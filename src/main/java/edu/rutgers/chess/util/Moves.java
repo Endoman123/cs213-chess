@@ -406,17 +406,17 @@ public class Moves {
         // 3) The king cannot be in check.
         // 4) The squares that the king passes over must not be under attack, nor the square where it lands on.
         if (isMajor && (b.getCastles() & 0x8) != 0 || (b.getCastles() & 0x2) != 0) { // King side castle
-            long testCheck = (0b00001110L << (rank * 8));
-            long testEmpty = (0b00000110L << (rank * 8));
+            long testCheck = (0b01110000L << (rank * 8 - 8));
+            long testEmpty = (0b01100000L << (rank * 8 - 8));
 
-            if ((Bitboards.getAttackedTiles(b, isMajor) & testCheck) == 0 && 
+            if ((Bitboards.getAttackedTiles(b, !isMajor) & testCheck) == 0 && 
                 (Bitboards.getOccupied(b) & testEmpty) == 0)
                     ret.add(encodeMove(file, rank, file + 2, rank, SPECIAL_1));
         } if (isMajor && (b.getCastles() & 0x4) != 0 || (b.getCastles() & 0x1) != 0) { // Queen side castle
-            long testCheck = (0b00111000L << (rank * 8));
-            long testEmpty = (0b01110000L << (rank * 8));
+            long testCheck = (0b00011100L << (rank * 8 - 8));
+            long testEmpty = (0b00001110L << (rank * 8 - 8));
 
-            if ((Bitboards.getAttackedTiles(b, isMajor) & testCheck) == 0 && 
+            if ((Bitboards.getAttackedTiles(b, !isMajor) & testCheck) == 0 && 
                 (Bitboards.getOccupied(b) & testEmpty) == 0)
                 ret.add(encodeMove(file, rank, file - 2, rank, SPECIAL_1 | SPECIAL_0));
         }

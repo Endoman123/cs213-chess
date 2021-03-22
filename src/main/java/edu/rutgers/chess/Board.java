@@ -112,6 +112,18 @@ public class Board {
         BOARD[from[1] - 1][from[0] - 1] = ' ';
 
         // Step 2: Figure out if we need to do any special things.
+        if (piece == 'K') // Major king, we need to uncheck castling flags
+            castles &= 0b0011;
+        else if (piece == 'k') // Minor king, we need to uncheck castling flags
+            castles &= 0b1100;
+
+        if ("Rr".contains("" + piece) && castles > 0) { // Rooks moved, decide on castling flags (if applicable)
+            if (from[0] == 1 && (castles & 0b1010) != 0) // Kingside rook moves, flip bit flags
+                castles &= isMajorTurn ? 0b1000 : 0b0010;
+            else if (from[0] == 8 && (castles & 0b0101) != 0) // Queenside rook moves, flip bit flags
+                castles &= isMajorTurn ? 0b0100 : 0b0001;
+        }
+
         if ("Pp".contains("" + piece) || flags == Moves.CAPTURE) // Reset halfmove clock
             halfmove = 0;           
         else
@@ -142,11 +154,11 @@ public class Board {
             }
         }
 
-        if ((flags & Moves.CAPTURE & Moves.PROMOTION) == 0 && (flags & Moves.SPECIAL_1) != 0) { // Castle
+        if (flags == Moves.SPECIAL_1 || flags == (Moves.SPECIAL_1 | Moves.SPECIAL_0)) { // Castle
             boolean kingCastle = (flags & Moves.SPECIAL_0) == 0;
 
-            BOARD[to[1] - 1][kingCastle ? 0 : 7] = ' ';
-            BOARD[to[1] - 1][kingCastle ? 2 : 5] = isMajorTurn ? 'R' : 'r';
+            BOARD[to[1] - 1][kingCastle ? 7 : 0] = ' ';
+            BOARD[to[1] - 1][kingCastle ? 5 : 2] = isMajorTurn ? 'R' : 'r';
         }
 
         // Step 3: Move our piece
