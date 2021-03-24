@@ -42,6 +42,10 @@ tasks.compileJava {
     options.release = 13
 }
 
+tasks.run {
+    standardInput = System.in
+}
+
 application {
     // Define the main class for the application.
     mainClass = "edu.rutgers.chess.Chess"
