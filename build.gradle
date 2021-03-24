@@ -46,6 +46,10 @@ tasks.run {
     standardInput = System.in
 }
 
+tasks.javadoc {
+    destinationDir = new File(projectDir, "/docs")
+}
+
 application {
     // Define the main class for the application.
     mainClass = "edu.rutgers.chess.Chess"

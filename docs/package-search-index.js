@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"edu.rutgers.chess"},{"l":"edu.rutgers.chess.util"}]

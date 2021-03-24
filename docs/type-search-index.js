@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"edu.rutgers.chess.util","l":"AlgebraicNotation"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"edu.rutgers.chess.util","l":"Bitboards"},{"p":"edu.rutgers.chess","l":"Board"},{"p":"edu.rutgers.chess","l":"Chess"},{"p":"edu.rutgers.chess.util","l":"Moves"}]
