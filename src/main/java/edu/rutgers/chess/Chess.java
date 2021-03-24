@@ -53,8 +53,6 @@ public class Chess {
             if (moves.length > 0) {
                 boolean requestDraw = false;
 
-                System.out.println(Arrays.toString(moves));
-
                 while (move == null) {
                     // Bitboards.printBitboard(Bitboards.getAttackedTiles(board, !board.getIsMajorTurn()));
                     System.out.print(board.getIsMajorTurn() ? "White's move: " : "Black's move: ");
