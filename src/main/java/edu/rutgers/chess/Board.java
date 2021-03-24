@@ -101,6 +101,7 @@ public class Board {
         String[] moves = move.split(" ");
         int[] from = AlgebraicNotation.fromAN(moves[0]);
         int[] to = AlgebraicNotation.fromAN(moves[1]);
+        int dir = isMajorTurn ? 1 : -1;
         byte flags = (byte)Integer.parseInt(moves[2]);
 
         char piece = getPiece(from[0], from[1]);
@@ -130,12 +131,11 @@ public class Board {
             halfmove++;
 
         if (flags == Moves.SPECIAL_0) // Double-pawn push, set en-passant state
-            enPassant = (byte)(to[0] + to[1] * 8 - 17);
+            enPassant = (byte)(to[0] + to[1] * 8 - dir * 8);
         else
             enPassant = -1;
 
         if (flags == (Moves.CAPTURE | Moves.SPECIAL_0)) { // En-passant, remove the proper piece from the board
-            int dir = isMajorTurn ? 1 : -1;
             BOARD[to[1] - 1 - dir][to[0] - 1] = ' ';
         }
 
