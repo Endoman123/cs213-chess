@@ -97,7 +97,7 @@ public class Moves {
             }
         }
 
-        return ret.toArray(new String[1]);
+        return ret.toArray(new String[0]);
     }
 
     /**
@@ -374,15 +374,15 @@ public class Moves {
 
         // Check the 8 squares around the king and make sure they are spaces the king can even move to.
         for (int f = -1; f < 2; f++)  {
+            if (file + f < 1 || file + f > 8)
+                continue;
+
             for (int r = -1; r < 2; r++) {
                 // Don't check the same tile the king is on
                 if (f == 0 && r == 0)
                     continue;
                
                 // Make sure the tile is in range
-                if (file + f < 1 || file + f > 8)
-                    continue;
-
                 if (rank + r < 1 || rank + r > 8)
                     continue;
 
@@ -438,19 +438,29 @@ public class Moves {
         int kingPos = 0;
         long attackedTiles = 0;
         boolean isMajor = Character.isUpperCase(b.getPiece(file, rank));
+        char curPiece = b.getPiece(file, rank);
         char curKing = isMajor ? 'K' : 'k';
         String memento = b.createMemento();
 
-        // Step 1: Get the king's position
-        for (kingPos = 0; kingPos < 64; kingPos++) {
-            if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == curKing)
-                break;
+        // Step 1: Get the king's position if we aren't moving them
+        if (curPiece != curKing) {
+            for (kingPos = 0; kingPos < 64; kingPos++) {
+                if (b.getPiece(kingPos % 8 + 1, kingPos / 8 + 1) == curKing)
+                    break;
+            }
         }
 
         // Step 2: Test all moves to see if the king is attacked in any of them
         while (i < curList.size()) {
             b.doMove(curList.get(i));
             attackedTiles = Bitboards.getAttackedTiles(b, !isMajor);
+
+            // If we are moving the king,
+            // we need to change the position that we check as we go
+            if (curPiece == curKing) {
+                int[] to = AlgebraicNotation.fromAN(curList.get(i).split(" ")[1]);
+                kingPos = to[0] + to[1] * 8 - 9;
+            }
 
             if ((attackedTiles & (1L << kingPos)) != 0)
                 curList.remove(i);
